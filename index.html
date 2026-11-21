@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="rating" content="adult">
+<meta name="robots" content="noindex, nofollow">
+<title>Nocturno · Solo adultos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1b1322; --surface:#271b30; --surface-2:#33243f; --line:#44325a;
+  --text:#f4ecf7; --muted:#b4a3c2; --accent:#ff5c7a; --accent-ink:#2a0713; --gold:#ffc46b;
+  --radius:14px;
+  --head:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"DM Sans","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html{color-scheme:dark}
+body{background:var(--bg);color:var(--text);font:400 15px/1.5 var(--body);min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.hidden{display:none!important}
+
+/* Age gate */
+#gate{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;
+  background:radial-gradient(120% 90% at 50% 0%,#3a2347 0%,var(--bg) 60%)}
+.gate-card{max-width:440px;text-align:center}
+.gate-card .badge{display:inline-grid;place-items:center;width:84px;height:84px;border-radius:50%;
+  border:3px solid var(--accent);font:800 30px var(--head);color:var(--accent);margin-bottom:22px}
+.gate-card h1{font:800 34px/1.1 var(--head);margin-bottom:12px}
+.gate-card p{color:var(--muted);margin-bottom:26px}
+.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{border:0;border-radius:999px;padding:11px 22px;font-weight:600;background:var(--surface-2);transition:background .15s}
+.btn:hover{background:var(--line)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{background:#ff7a93}
+
+/* Header */
+header{position:sticky;top:0;z-index:20;background:rgba(27,19,34,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line)}
+.bar{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.logo{font:800 24px var(--head);letter-spacing:-.02em;white-space:nowrap}
+.logo span{color:var(--accent)}
+.search{flex:1;min-width:200px;display:flex}
+.search input{flex:1;background:var(--surface);border:1px solid var(--line);border-right:0;
+  border-radius:999px 0 0 999px;padding:10px 18px}
+.search input::placeholder{color:var(--muted)}
+.search button{background:var(--accent);color:var(--accent-ink);border:0;border-radius:0 999px 999px 0;padding:0 20px;font-weight:600}
+.icon-btn{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 16px}
+nav{max-width:1280px;margin:0 auto;padding:0 20px 10px;display:flex;gap:6px;overflow-x:auto}
+nav button{background:none;border:0;padding:8px 16px;border-radius:999px;color:var(--muted);font-weight:500;white-space:nowrap}
+nav button:hover{color:var(--text)}
+nav button[aria-current="true"]{background:var(--surface-2);color:var(--text)}
+
+/* Content */
+main{max-width:1280px;margin:0 auto;padding:22px 20px 60px}
+.title-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+h2{font:700 24px var(--head);letter-spacing:-.01em}
+.filters{display:flex;gap:8px}
+.filters select{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px 18px}
+.card{background:none;border:0;text-align:left;padding:0;display:block;width:100%}
+.thumb{position:relative;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;background:var(--surface-2)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.card:hover .thumb img{transform:scale(1.04)}
+.dur{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.75);padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600}
+.card h3{font:600 15px/1.3 var(--body);margin:10px 2px 2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{color:var(--muted);font-size:13px;margin:0 2px}
+.skeleton .thumb{animation:pulse 1.2s ease-in-out infinite alternate}
+.skeleton .line{height:12px;border-radius:6px;background:var(--surface-2);margin:12px 2px 0;width:80%}
+@keyframes pulse{to{opacity:.45}}
+.pager{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:34px}
+.pager span{color:var(--muted)}
+.pager .btn:disabled{opacity:.35;cursor:not-allowed}
+.notice{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;max-width:640px}
+.notice h3{font:700 18px var(--head);margin-bottom:6px}
+.notice p{color:var(--muted);margin-bottom:14px}
+
+/* Modals */
+dialog{border:0;border-radius:18px;background:var(--surface);color:var(--text);padding:0;width:min(960px,94vw);max-height:92vh;overflow:auto}
+dialog::backdrop{background:rgba(10,5,14,.82)}
+.dlg-head{display:flex;justify-content:space-between;align-items:start;gap:12px;padding:16px 18px 10px}
+.dlg-head h3{font:700 18px/1.3 var(--head)}
+.close{background:var(--surface-2);border:0;border-radius:50%;width:36px;height:36px;flex:none}
+video{width:100%;max-height:70vh;background:#000;display:block}
+.dlg-body{padding:14px 18px 20px;color:var(--muted)}
+.dlg-body a{color:var(--gold)}
+.field{display:grid;gap:6px;margin-bottom:16px}
+.field label{font-weight:600}
+.field input[type=text]{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.field small{color:var(--muted)}
+.check{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+footer{border-top:1px solid var(--line);padding:22px 20px;text-align:center;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Verificación de edad -->
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="gate-card">
+    <div class="badge">18+</div>
+    <h1 id="gate-title">Contenido solo para adultos</h1>
+    <p>Este sitio muestra material sexualmente explícito. Debes tener al menos 18 años (o la mayoría de edad en tu país) y que ver este contenido sea legal donde vives.</p>
+    <div class="row">
+      <button class="btn primary" id="gate-yes">Tengo 18 años o más</button>
+      <button class="btn" id="gate-no">Salir</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="bar">
+    <div class="logo">noc<span>turno</span></div>
+    <form class="search" id="search-form" role="search">
+      <input id="q" type="search" placeholder="Buscar videos" aria-label="Buscar videos" autocomplete="off">
+      <button type="submit">Buscar</button>
+    </form>
+    <button class="icon-btn" id="open-settings">Conexión</button>
+  </div>
+  <nav id="tabs" aria-label="Secciones">
+    <button data-mode="fresh" aria-current="true">Novedades</button>
+    <button data-mode="dashboard">Inicio</button>
+    <button data-mode="best">Mejores del mes</button>
+    <button data-mode="verified">Verificados</button>
+  </nav>
+</header>
+
+<main>
+  <div class="title-row">
+    <h2 id="section-title">Novedades</h2>
+    <div class="filters hidden" id="best-filters">
+      <select id="f-month" aria-label="Mes"></select>
+      <select id="f-year" aria-label="Año"></select>
+    </div>
+  </div>
+  <div id="status"></div>
+  <div class="grid" id="grid"></div>
+  <div class="pager hidden" id="pager">
+    <button class="btn" id="prev">Anterior</button>
+    <span id="page-label"></span>
+    <button class="btn" id="next">Siguiente</button>
+  </div>
+</main>
+
+<footer>
+  Solo para mayores de 18 años. Todo el contenido pertenece a sus respectivos propietarios; esta página no aloja videos.
+</footer>
+
+<!-- Reproductor -->
+<dialog id="player-dlg" aria-labelledby="player-title">
+  <div class="dlg-head">
+    <h3 id="player-title"></h3>
+    <button class="close" id="player-close" aria-label="Cerrar">✕</button>
+  </div>
+  <div id="player-area"></div>
+  <div class="dlg-body" id="player-info"></div>
+</dialog>
+
+<!-- Conexión -->
+<dialog id="settings-dlg" aria-labelledby="settings-title" style="width:min(520px,94vw)">
+  <div class="dlg-head">
+    <h3 id="settings-title">Conexión con la API</h3>
+    <button class="close" id="settings-close" aria-label="Cerrar">✕</button>
+  </div>
+  <div class="dlg-body">
+    <div class="field">
+      <label for="api-base">URL del servidor</label>
+      <input type="text" id="api-base" placeholder="http://localhost:3000">
+      <small>Servidor Node que expone <code>xvideos-lib</code> (ver instrucciones al final del archivo).</small>
+    </div>
+    <label class="check"><input type="checkbox" id="demo-mode"> Modo demostración (datos de ejemplo, sin servidor)</label>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn primary" id="settings-save">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const store = {
+    get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
+    set(k, v){ try { localStorage.setItem(k, v); } catch {} }
+  };
+
+  // Búsquedas relacionadas con menores: bloqueadas siempre en el cliente.
+  const BLOCKED = /\b(child|children|kid|kids|minor|underage|under\s?age|preteen|pre-teen|loli\w*|jailbait|toddler|infant|cp|pedo\w*|niñ[oa]s?|menor(es)?)\b/i;
+
+  const state = {
+    mode: 'fresh', page: 1, key: '',
+    year: String(new Date().getFullYear()), month: String(new Date().getMonth() + 1).padStart(2, '0'),
+    base: store.get('nx_base', location.protocol.startsWith('http') ? location.origin : 'http://localhost:3000'),
+    demo: store.get('nx_demo', location.protocol.startsWith('http') ? '0' : '1') === '1',
+    hasNext: false, pages: []
+  };
+  const TITLES = { fresh: 'Novedades', dashboard: 'Inicio', best: 'Mejores del mes', verified: 'Verificados' };
+
+  /* ---------- Verificación de edad ---------- */
+  if (store.get('nx_age', '') === 'ok') $('#gate').classList.add('hidden');
+  $('#gate-yes').onclick = () => { store.set('nx_age', 'ok'); $('#gate').classList.add('hidden'); };
+  $('#gate-no').onclick = () => { location.href = 'https://www.google.com'; };
+
+  /* ---------- Datos: API (espejo de xvideos-lib) y demo ---------- */
+  function endpoint(){
+    const q = new URLSearchParams({ page: state.page });
+    if (state.key) { q.set('key', state.key); return `${state.base}/videos/dashboard?${q}`; }
+    if (state.mode === 'best') { q.set('year', state.year); q.set('month', state.month); }
+    return `${state.base}/videos/${state.mode}?${q}`;
+  }
+
+  function demoPage(){
+    const hues = [330, 285, 18, 260, 350, 40];
+    const videos = Array.from({ length: 24 }, (_, i) => {
+      const n = (state.page - 1) * 24 + i + 1, h = hues[i % hues.length];
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 9"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${h} 60% 35%)"/><stop offset="1" stop-color="hsl(${(h + 50) % 360} 55% 18%)"/></linearGradient></defs><rect width="16" height="9" fill="url(#g)"/></svg>`;
+      return { url: '', title: `Video de ejemplo ${n}${state.key ? ' · ' + state.key : ''}`, duration: `${5 + (n * 7) % 40} min`,
+               views: `${(n * 137) % 900 + 10}k`, profile: { name: 'Canal demo' }, thumb: 'data:image/svg+xml,' + encodeURIComponent(svg) };
+    });
+    return Promise.resolve({ videos, pagination: { current: state.page, pages: [1, 2, 3, 4, 5] } });
+  }
+
+  async function load(){
+    const grid = $('#grid'), status = $('#status');
+    status.innerHTML = '';
+    grid.innerHTML = Array(12).fill('<div class="skeleton"><div class="thumb"></div><div class="line"></div></div>').join('');
+    $('#pager').classList.add('hidden');
+    try {
+      let data;
+      if (state.demo) data = await demoPage();
+      else {
+        const r = await fetch(endpoint(), { headers: { Accept: 'application/json' } });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        data = await r.json();
+      }
+      render(data);
+    } catch (e) {
+      grid.innerHTML = '';
+      status.innerHTML = `<div class="notice"><h3>No se pudo conectar con el servidor</h3>
+        <p>Comprueba que tu servidor esté en marcha en <b>${esc(state.base)}</b> y que permita CORS. Mientras tanto puedes usar el modo demostración.</p>
+        <div class="row" style="justify-content:flex-start"><button class="btn primary" id="retry-demo">Usar modo demostración</button>
+        <button class="btn" id="retry-settings">Cambiar conexión</button></div></div>`;
+      $('#retry-demo').onclick = () => { state.demo = true; store.set('nx_demo', '1'); load(); };
+      $('#retry-settings').onclick = openSettings;
+    }
+  }
+
+  function render(data){
+    const vids = (data.videos || []).filter(v => !BLOCKED.test(v.title || ''));
+    state.pages = (data.pagination && data.pagination.pages) || [];
+    const cur = (data.pagination && data.pagination.current) || state.page;
+    state.hasNext = typeof data.hasNext === 'boolean' ? data.hasNext : state.pages.some(p => Number(p) > cur);
+    if (!vids.length) {
+      $('#grid').innerHTML = '';
+      $('#status').innerHTML = '<div class="notice"><h3>Sin resultados</h3><p>Prueba con otra búsqueda o sección.</p></div>';
+      return;
+    }
+    $('#grid').innerHTML = vids.map((v, i) => `
+      <button class="card" data-i="${i}">
+        <div class="thumb">
+          <img loading="lazy" referrerpolicy="no-referrer" alt="" src="${esc(v.thumb || v.image || v.thumbnail || '')}">
+          <span class="dur">${esc(v.duration || '')}</span>
+        </div>
+        <h3>${esc(v.title || 'Sin título')}</h3>
+        <p class="meta">${esc((v.profile && v.profile.name) || '')}${v.views ? ' · ' + esc(v.views) + ' vistas' : ''}</p>
+      </button>`).join('');
+    $('#grid').querySelectorAll('.card').forEach(c => c.onclick = () => play(vids[c.dataset.i]));
+    $('#pager').classList.remove('hidden');
+    $('#prev').disabled = state.page <= 1;
+    $('#next').disabled = !state.hasNext;
+    $('#page-label').textContent = 'Página ' + state.page;
+    window.scrollTo({ top: 0 });
+  }
+
+  /* ---------- Reproductor ---------- */
+  let hls = null;
+  async function play(v){
+    const dlg = $('#player-dlg'), area = $('#player-area'), info = $('#player-info');
+    $('#player-title').textContent = v.title || '';
+    area.innerHTML = ''; info.innerHTML = 'Cargando…';
+    dlg.showModal();
+    if (state.demo || !v.url) { info.textContent = 'Modo demostración: conecta tu servidor para reproducir videos reales.'; return; }
+    try {
+      const r = await fetch(`${state.base}/videos/details?url=${encodeURIComponent(v.url)}`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json(), f = d.files || {};
+      const el = document.createElement('video');
+      el.controls = true; el.autoplay = true; el.playsInline = true; el.poster = f.thumbSlideBig || f.thumb || d.image || '';
+      area.appendChild(el);
+      if (f.HLS && window.Hls && Hls.isSupported()) { hls = new Hls(); hls.loadSource(f.HLS); hls.attachMedia(el); }
+      else if (f.HLS && el.canPlayType('application/vnd.apple.mpegurl')) el.src = f.HLS;
+      else if (f.high || f.low) el.src = f.high || f.low;
+      else throw new Error('Sin fuentes de video');
+      info.innerHTML = `${esc(d.duration ? d.duration + ' · ' : '')}${esc(d.views ? d.views + ' vistas' : '')}
+        ${v.url ? ` · <a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">Ver en el sitio original</a>` : ''}`;
+    } catch (e) {
+      info.innerHTML = `No se pudo cargar el video. ${v.url ? `<a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">Abrir en el sitio original</a>` : ''}`;
+    }
+  }
+  function stopPlayer(){
+    if (hls) { hls.destroy(); hls = null; }
+    const v = $('#player-area video'); if (v) { v.pause(); v.removeAttribute('src'); v.load(); }
+    $('#player-area').innerHTML = '';
+  }
+  $('#player-close').onclick = () => $('#player-dlg').close();
+  $('#player-dlg').addEventListener('close', stopPlayer);
+
+  /* ---------- Navegación ---------- */
+  function setMode(mode){
+    state.mode = mode; state.page = 1; state.key = ''; $('#q').value = '';
+    $('#tabs').querySelectorAll('button').forEach(b => b.setAttribute('aria-current', String(b.dataset.mode === mode)));
+    $('#section-title').textContent = TITLES[mode];
+    $('#best-filters').classList.toggle('hidden', mode !== 'best');
+    load();
+  }
+  $('#tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setMode(b.dataset.mode); });
+
+  $('#search-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const k = $('#q').value.trim();
+    if (!k) return setMode('fresh');
+    if (BLOCKED.test(k)) { $('#grid').innerHTML = ''; $('#status').innerHTML = '<div class="notice"><h3>Búsqueda no permitida</h3><p>Este término no está permitido en este sitio.</p></div>'; return; }
+    state.key = k; state.page = 1;
+    $('#tabs').querySelectorAll('button').forEach(b => b.setAttribute('aria-current', 'false'));
+    $('#section-title').textContent = 'Resultados para “' + k + '”';
+    $('#best-filters').classList.add('hidden');
+    load();
+  });
+  $('#prev').onclick = () => { if (state.page > 1) { state.page--; load(); } };
+  $('#next').onclick = () => { if (state.hasNext) { state.page++; load(); } };
+
+  // Filtros de "Mejores"
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  $('#f-month').innerHTML = months.map((m, i) => `<option value="${String(i + 1).padStart(2, '0')}">${m}</option>`).join('');
+  const y = new Date().getFullYear();
+  $('#f-year').innerHTML = Array.from({ length: 10 }, (_, i) => `<option>${y - i}</option>`).join('');
+  $('#f-month').value = state.month; $('#f-year').value = state.year;
+  $('#f-month').onchange = e => { state.month = e.target.value; state.page = 1; load(); };
+  $('#f-year').onchange = e => { state.year = e.target.value; state.page = 1; load(); };
+
+  /* ---------- Ajustes ---------- */
+  function openSettings(){ $('#api-base').value = state.base; $('#demo-mode').checked = state.demo; $('#settings-dlg').showModal(); }
+  $('#open-settings').onclick = openSettings;
+  $('#settings-close').onclick = () => $('#settings-dlg').close();
+  $('#settings-save').onclick = () => {
+    state.base = $('#api-base').value.trim().replace(/\/+$/, '') || 'http://localhost:3000';
+    state.demo = $('#demo-mode').checked;
+    store.set('nx_base', state.base); store.set('nx_demo', state.demo ? '1' : '0');
+    $('#settings-dlg').close(); state.page = 1; load();
+  };
+
+  function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+  load();
+})();
+</script>
+
+<!--
+=====================================================================
+SERVIDOR PUENTE (xvideos-lib es una librería de Node, no corre en el navegador)
+Guarda esto como server.js junto a este HTML y ejecuta:
+  npm init -y && npm i xvideos-lib express cors
+  node server.js
+
+const express = require('express');
+const cors = require('cors');
+const xvideos = require('xvideos-lib');
+const app = express();
+app.use(cors());
+
+const wrap = list => ({
+  videos: list.videos,
+  pagination: list.pagination,
+  hasNext: list.hasNext()
+});
+const page = req => Number(req.query.page) || 1;
+
+app.get('/videos/fresh',     async (q, r) => r.json(wrap(await xvideos.videos.fresh({ page: page(q) }))));
+app.get('/videos/dashboard', async (q, r) => r.json(wrap(await xvideos.videos.dashboard({ page: page(q), key: q.query.key }))));
+app.get('/videos/best',      async (q, r) => r.json(wrap(await xvideos.videos.best({ year: q.query.year, month: q.query.month, page: page(q) }))));
+app.get('/videos/verified',  async (q, r) => r.json(wrap(await xvideos.videos.verified({ page: page(q) }))));
+app.get('/videos/details',   async (q, r) => r.json(await xvideos.videos.details({ url: q.query.url })));
+
+app.listen(3000, () => console.log('API en http://localhost:3000'));
+=====================================================================
+-->
+</body>
+</html>
